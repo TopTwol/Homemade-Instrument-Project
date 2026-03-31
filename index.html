@@ -2,86 +2,413 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Homemade-Instrument-Project</title>
+  <title>Voice Keys</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      height: 100vh;
-      background: #111;
+      justify-content: center;
+      min-height: 100vh;
+      background: #0d0d12;
+      font-family: 'Segoe UI', sans-serif;
+      color: #fff;
+      gap: 28px;
+      user-select: none;
     }
+
+    h1 {
+      font-size: 0.75rem;
+      letter-spacing: 6px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+    }
+
+    #viz-wrap {
+      width: 680px;
+      height: 72px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+
+    canvas { display: block; }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .toggle {
+      padding: 7px 18px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      background: transparent;
+      color: rgba(255,255,255,0.45);
+      cursor: pointer;
+      font-size: 0.68rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .toggle.on {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.9);
+    }
+
     .container {
-      display: grid;
-      grid-template-columns: repeat(5, 120px);
-      gap: 20px;
+      display: flex;
+      gap: 18px;
     }
-    img {
+
+    .key {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .img-wrap {
+      position: relative;
       width: 120px;
       height: 120px;
-      cursor: pointer;
-      border-radius: 10px;
-      transition: transform 0.2s;
     }
-    img:active {
-      transform: scale(0.9);
+
+    .img-wrap img {
+      width: 120px;
+      height: 120px;
+      border-radius: 14px;
+      display: block;
+      pointer-events: none;
+      transition: filter 0.08s, transform 0.08s;
+      -webkit-user-drag: none;
+    }
+
+    .key.pressed .img-wrap img {
+      transform: scale(0.93);
+      filter: brightness(1.35) saturate(1.4);
+    }
+
+    .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,0);
+      transition: border-color 0.08s;
+      pointer-events: none;
+    }
+
+    .key.pressed .ring {
+      border-color: rgba(255,255,255,0.55);
+    }
+
+    .ripple-el {
+      position: absolute;
+      inset: 0;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.18);
+      pointer-events: none;
+      animation: ripple-out 0.45s ease-out forwards;
+    }
+
+    @keyframes ripple-out {
+      to { transform: scale(1.45); opacity: 0; }
+    }
+
+    .vowel {
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      font-weight: 300;
+      color: rgba(255,255,255,0.35);
+      transition: color 0.08s, text-shadow 0.08s;
+    }
+
+    .key.pressed .vowel {
+      color: rgba(255,255,255,0.95);
+      text-shadow: 0 0 14px rgba(255,255,255,0.5);
+    }
+
+    .kbd {
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.2);
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <img src="image1.png" data-alt="image2.png" data-freq="261.6">
-  <img src="image1.png" data-alt="image2.png" data-freq="293.7">
-  <img src="image1.png" data-alt="image2.png" data-freq="329.6">
-  <img src="image1.png" data-alt="image2.png" data-freq="349.2">
-  <img src="image1.png" data-alt="image2.png" data-freq="392.0">
+
+<h1>Voice Keys</h1>
+
+<div id="viz-wrap">
+  <canvas id="viz" width="680" height="72"></canvas>
 </div>
+
+<div class="controls">
+  <button class="toggle on" id="btnVibrato">Vibrato</button>
+  <button class="toggle on" id="btnReverb">Reverb</button>
+  <button class="toggle" id="btnHarmony">Harmony</button>
+  <button class="toggle" id="btnBreath">Breath</button>
+</div>
+
+<div class="container" id="keys">
+  <div class="key" data-freq="261.6" data-vowel="AH" data-kbd="A">
+    <div class="img-wrap">
+      <img src="image1.png" data-alt="image2.png">
+      <div class="ring"></div>
+    </div>
+    <div class="vowel">AH</div>
+    <div class="kbd">[ A ]</div>
+  </div>
+  <div class="key" data-freq="293.7" data-vowel="EH" data-kbd="S">
+    <div class="img-wrap">
+      <img src="image1.png" data-alt="image2.png">
+      <div class="ring"></div>
+    </div>
+    <div class="vowel">EH</div>
+    <div class="kbd">[ S ]</div>
+  </div>
+  <div class="key" data-freq="329.6" data-vowel="EE" data-kbd="D">
+    <div class="img-wrap">
+      <img src="image1.png" data-alt="image2.png">
+      <div class="ring"></div>
+    </div>
+    <div class="vowel">EE</div>
+    <div class="kbd">[ D ]</div>
+  </div>
+  <div class="key" data-freq="349.2" data-vowel="OH" data-kbd="F">
+    <div class="img-wrap">
+      <img src="image1.png" data-alt="image2.png">
+      <div class="ring"></div>
+    </div>
+    <div class="vowel">OH</div>
+    <div class="kbd">[ F ]</div>
+  </div>
+  <div class="key" data-freq="392.0" data-vowel="OO" data-kbd="G">
+    <div class="img-wrap">
+      <img src="image1.png" data-alt="image2.png">
+      <div class="ring"></div>
+    </div>
+    <div class="vowel">OO</div>
+    <div class="kbd">[ G ]</div>
+  </div>
+</div>
+
 <script>
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  let currentOsc = null;
-  let currentGain = null;
+const FORMANTS = {
+  AH: [[800,4],[1200,8],[2500,10]],
+  EH: [[530,4],[1840,9],[2480,12]],
+  EE: [[270,4],[2300,10],[3000,14]],
+  OH: [[570,4],[840,7],[2410,10]],
+  OO: [[300,4],[870,7],[2240,10]],
+};
 
-  function startTone(freq) {
+const ctx = new (window.AudioContext || window.webkitAudioContext)();
+const analyser = ctx.createAnalyser();
+analyser.fftSize = 2048;
+
+const dryOut  = ctx.createGain(); dryOut.gain.value = 0.75;
+const wetOut  = ctx.createGain(); wetOut.gain.value = 0.45;
+dryOut.connect(ctx.destination);
+wetOut.connect(ctx.destination);
+analyser.connect(ctx.destination);
+
+const convolver = ctx.createConvolver();
+(function buildReverb() {
+  const sr = ctx.sampleRate, len = sr * 2.8;
+  const buf = ctx.createBuffer(2, len, sr);
+  for (let c = 0; c < 2; c++) {
+    const d = buf.getChannelData(c);
+    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.pow(1-i/len, 1.6);
+  }
+  convolver.buffer = buf;
+})();
+convolver.connect(wetOut);
+
+let useVibrato = true, useReverb = true, useHarmony = false, useBreath = false;
+let activeVoice = null;
+
+function makeNoise(dur) {
+  const len = Math.floor(ctx.sampleRate * dur);
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random()*2-1;
+  return buf;
+}
+
+function startVoice(freq, vowel) {
+  stopVoice();
+  const formants = FORMANTS[vowel];
+  const nodes = [];
+
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(0, ctx.currentTime);
+  master.gain.linearRampToValueAtTime(0.65, ctx.currentTime + 0.09);
+  master.connect(dryOut);
+  master.connect(analyser);
+  if (useReverb) master.connect(convolver);
+
+  function addLayer(pitch, lvl) {
     const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.frequency.value = freq;
-    osc.type = "sine";
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    gain.gain.setValueAtTime(1, ctx.currentTime);
-    osc.start();
-    currentOsc = osc;
-    currentGain = gain;
-  }
+    osc.type = 'sawtooth';
+    osc.frequency.value = pitch;
 
-  function stopTone() {
-    if (currentGain && currentOsc) {
-      currentGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-      currentOsc.stop(ctx.currentTime + 0.1);
-      currentOsc = null;
-      currentGain = null;
+    if (useVibrato) {
+      const lfo = ctx.createOscillator();
+      const lfoG = ctx.createGain();
+      lfo.frequency.value = 5.3;
+      lfoG.gain.value = pitch * 0.013;
+      lfo.connect(lfoG);
+      lfoG.connect(osc.frequency);
+      lfo.start();
+      nodes.push(lfo);
     }
-  }
 
-  document.querySelectorAll("img").forEach(img => {
-    const freq = parseFloat(img.dataset.freq);
-    const defaultSrc = img.src;
-    const altSrc = img.dataset.alt;
+    const layerGain = ctx.createGain();
+    layerGain.gain.value = lvl;
 
-    img.addEventListener("mousedown", async () => {
-      await ctx.resume();
-      img.src = altSrc;
-      startTone(freq);
+    formants.forEach(([f, q], i) => {
+      const filt = ctx.createBiquadFilter();
+      filt.type = 'bandpass';
+      filt.frequency.value = f;
+      filt.Q.value = q;
+      const fg = ctx.createGain();
+      fg.gain.value = i === 0 ? 1.0 : i === 1 ? 0.65 : 0.25;
+      osc.connect(filt);
+      filt.connect(fg);
+      fg.connect(layerGain);
     });
 
-    const release = () => {
-      img.src = defaultSrc;
-      stopTone();
-    };
+    layerGain.connect(master);
+    osc.start();
+    nodes.push(osc);
+  }
 
-    img.addEventListener("mouseup", release);
-    img.addEventListener("mouseleave", release);
+  addLayer(freq, 1.0);
+  if (useHarmony) {
+    addLayer(freq * 1.2599, 0.38);
+    addLayer(freq * 1.4983, 0.28);
+  }
+
+  if (useBreath) {
+    const nSrc = ctx.createBufferSource();
+    nSrc.buffer = makeNoise(0.35);
+    const nFilt = ctx.createBiquadFilter();
+    nFilt.type = 'highpass';
+    nFilt.frequency.value = 2800;
+    const nGain = ctx.createGain();
+    nGain.gain.setValueAtTime(0.12, ctx.currentTime);
+    nGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.28);
+    nSrc.connect(nFilt);
+    nFilt.connect(nGain);
+    nGain.connect(master);
+    nSrc.start();
+  }
+
+  activeVoice = { nodes, master };
+}
+
+function stopVoice() {
+  if (!activeVoice) return;
+  const { nodes, master } = activeVoice;
+  const t = ctx.currentTime;
+  master.gain.setValueAtTime(master.gain.value, t);
+  master.gain.linearRampToValueAtTime(0, t + 0.22);
+  setTimeout(() => nodes.forEach(n => { try { n.stop(); } catch(e){} }), 260);
+  activeVoice = null;
+}
+
+function spawnRipple(wrap) {
+  const r = document.createElement('div');
+  r.className = 'ripple-el';
+  wrap.appendChild(r);
+  r.addEventListener('animationend', () => r.remove());
+}
+
+const keyMap = {};
+document.querySelectorAll('.key').forEach(key => {
+  const freq   = parseFloat(key.dataset.freq);
+  const vowel  = key.dataset.vowel;
+  const kbd    = key.dataset.kbd;
+  const wrap   = key.querySelector('.img-wrap');
+  const img    = key.querySelector('img');
+  const imgDef = img.src;
+  const imgAlt = img.dataset.alt;
+
+  keyMap[kbd.toLowerCase()] = key;
+
+  function press() {
+    if (key.classList.contains('pressed')) return;
+    ctx.resume();
+    key.classList.add('pressed');
+    img.src = imgAlt;
+    spawnRipple(wrap);
+    startVoice(freq, vowel);
+  }
+
+  function release() {
+    if (!key.classList.contains('pressed')) return;
+    key.classList.remove('pressed');
+    img.src = imgDef;
+    stopVoice();
+  }
+
+  key.addEventListener('mousedown', press);
+  key.addEventListener('mouseup', release);
+  key.addEventListener('mouseleave', release);
+  key.addEventListener('touchstart', e => { e.preventDefault(); press(); }, { passive: false });
+  key.addEventListener('touchend', e => { e.preventDefault(); release(); });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.repeat) return;
+  const key = keyMap[e.key.toLowerCase()];
+  if (key) key.dispatchEvent(new MouseEvent('mousedown'));
+});
+document.addEventListener('keyup', e => {
+  const key = keyMap[e.key.toLowerCase()];
+  if (key) key.dispatchEvent(new MouseEvent('mouseup'));
+});
+
+function bindToggle(id, get, set) {
+  const btn = document.getElementById(id);
+  btn.addEventListener('click', () => {
+    set(!get());
+    btn.classList.toggle('on', get());
   });
+}
+bindToggle('btnVibrato', () => useVibrato, v => useVibrato = v);
+bindToggle('btnReverb',  () => useReverb,  v => { useReverb = v; wetOut.gain.value = v ? 0.45 : 0; });
+bindToggle('btnHarmony', () => useHarmony, v => useHarmony = v);
+bindToggle('btnBreath',  () => useBreath,  v => useBreath  = v);
+
+const canvas = document.getElementById('viz');
+const vCtx = canvas.getContext('2d');
+const BUF = new Uint8Array(analyser.frequencyBinCount);
+
+function drawViz() {
+  requestAnimationFrame(drawViz);
+  analyser.getByteTimeDomainData(BUF);
+  vCtx.clearRect(0, 0, 680, 72);
+  vCtx.beginPath();
+  vCtx.strokeStyle = 'rgba(255,255,255,0.55)';
+  vCtx.lineWidth = 1.4;
+  const sliceW = 680 / BUF.length;
+  let x = 0;
+  for (let i = 0; i < BUF.length; i++) {
+    const y = (BUF[i] / 128) * 36;
+    i === 0 ? vCtx.moveTo(x, y) : vCtx.lineTo(x, y);
+    x += sliceW;
+  }
+  vCtx.stroke();
+}
+drawViz();
 </script>
 </body>
 </html>
