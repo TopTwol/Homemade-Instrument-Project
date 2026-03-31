@@ -87,9 +87,38 @@ function playShort(freq) {
     img.addEventListener("mousedown", async () => {
       await ctx.resume();
       holding = true;
+
+      // ALWAYS switch image on press
       img.src = img.dataset.alt;
+
       startTone(freq);
     });
+
+    img.addEventListener("mouseup", () => {
+      if (holding) {
+        stopTone();
+        holding = false;
+      }
+    });
+
+    img.addEventListener("mouseleave", () => {
+      if (holding) {
+        stopTone();
+        holding = false;
+      }
+    });
+
+    img.addEventListener("click", async () => {
+      await ctx.resume();
+
+      // ALSO force image change on click (backup)
+      img.src = img.dataset.alt;
+
+      if (!holding) {
+        playShort(freq);
+      }
+    });
+  });
 
     img.addEventListener("mouseup", () => {
       if (holding) {
