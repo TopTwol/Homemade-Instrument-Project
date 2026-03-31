@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Pitch Grid</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #111;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(5, 120px);
+      gap: 20px;
+    }
+
+    img {
+      width: 120px;
+      height: 120px;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: transform 0.2s;
+    }
+
+    img:active {
+      transform: scale(0.9);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <img src="image1.png" data-alt="image2.png" data-freq="261.6">
+  <img src="image1.png" data-alt="image2.png" data-freq="293.7">
+  <img src="image1.png" data-alt="image2.png" data-freq="329.6">
+  <img src="image1.png" data-alt="image2.png" data-freq="349.2">
+  <img src="image1.png" data-alt="image2.png" data-freq="392.0">
+</div>
+
+<script>
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playTone(freq) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.frequency.value = freq;
+    osc.type = "sine";
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    gain.gain.setValueAtTime(1, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+
+    osc.stop(ctx.currentTime + 0.5);
+  }
+
+  document.querySelectorAll("img").forEach(img => {
+    let toggled = false;
+
+    img.addEventListener("click", () => {
+      // swap image
+      if (!toggled) {
+        img.src = img.dataset.alt;
+      } else {
+        img.src = "image1.png";
+      }
+      toggled = !toggled;
+
+      // play sound
+      playTone(parseFloat(img.dataset.freq));
+    });
+  });
+</script>
+
+</body>
+</html>
