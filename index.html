@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Image Pitch Grid</title>
+  <title>Homemade-Instrument-Project</title>
   <style>
     body {
       display: flex;
@@ -62,16 +62,9 @@
   }
 
   document.querySelectorAll("img").forEach(img => {
-    let toggled = false;
-
     img.addEventListener("click", () => {
-      // swap image
-      if (!toggled) {
-        img.src = img.dataset.alt;
-      } else {
-        img.src = "image1.png";
-      }
-      toggled = !toggled;
+      // change image (no toggle, always switch to image2)
+      img.src = img.dataset.alt;
 
       // play sound
       playTone(parseFloat(img.dataset.freq));
