@@ -44,31 +44,75 @@
 <script>
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-  function playTone(freq) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+  let currentOsc = null;
+let currentGain = null;
 
-    osc.frequency.value = freq;
-    osc.type = "sine";
+function startTone(freq) {
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+  osc.frequency.value = freq;
+  osc.type = "sine";
 
-    osc.start();
-    gain.gain.setValueAtTime(1, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
 
-    osc.stop(ctx.currentTime + 0.5);
+  gain.gain.setValueAtTime(1, ctx.currentTime);
+
+  osc.start();
+
+  currentOsc = osc;
+  currentGain = gain;
+}
+
+function stopTone() {
+  if (currentGain && currentOsc) {
+    currentGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    currentOsc.stop(ctx.currentTime + 0.1);
+    currentOsc = null;
+    currentGain = null;
   }
+}
+
+function playShort(freq) {
+  startTone(freq);
+  setTimeout(() => stopTone(), 100);
+}
 
   document.querySelectorAll("img").forEach(img => {
-    img.addEventListener("click", () => {
-      // change image (no toggle, always switch to image2)
-      img.src = img.dataset.alt;
+    const freq = parseFloat(img.dataset.freq);
+    let holding = false;
 
-      // play sound
-      playTone(parseFloat(img.dataset.freq));
+    img.addEventListener("mousedown", async () => {
+      await ctx.resume();
+      holding = true;
+      img.src = img.dataset.alt;
+      startTone(freq);
     });
+
+    img.addEventListener("mouseup", () => {
+      if (holding) {
+        stopTone();
+        holding = false;
+      }
+    });
+
+    img.addEventListener("mouseleave", () => {
+      if (holding) {
+        stopTone();
+        holding = false;
+      }
+    });
+
+    img.addEventListener("click", async () => {
+      await ctx.resume();
+      if (!holding) {
+        img.src = img.dataset.alt;
+        playShort(freq);
+      }
+    });
+  });
   });
 </script>
 
